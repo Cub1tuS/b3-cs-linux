@@ -29,7 +29,7 @@ public (active)
 
 🌞 **Fichiers /etc/sudoers /etc/passwd /etc/group** dans le dépôt de compte-rendu svp !
 
-[Les fichiers sont ici](./files)
+[Les fichiers sont ici](../files)
 
 # Suite du TP
 
