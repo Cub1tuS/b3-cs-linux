@@ -38,55 +38,55 @@ sudo kill 2410
 
 ## 2. Utilisateur applicatif
 
-Lorsqu'un programme s'exécute sur une machine (peu importe l'OS ou le contexte), le programme est **toujours** exécuté sous l'identité d'un utilisateur.  
-Ainsi, pendant son exécution, le programme aura les droits de cet utilisateur.  
-
-> Par exemple, un programme lancé en tant que `toto` pourra lire un fichier `/var/log/toto.log` uniquement si l'utilisateur `toto` a les droits sur ce fichier.
-
 🌞 **Créer un utilisateur applicatif**
 
-- c'est lui qui lancera `efrei_server`
-- avec une commande `useradd`
-- choisissez...
-  - un nom approprié
-  - un homedir approprié
-  - un shell approprié
-
-> N'hésitez pas à venir vers moi pour discuter de ce qui est le plus "approprié" si nécessaire.
+```bash
+sudo useradd -d /var/lib/efrei_server/ -s /sbin/nologin efrei-user
+```
 
 🌞 **Modifier le service pour que ce nouvel utilisateur lance le programme `efrei_server`**
 
-- je vous laisse chercher la clause appropriée à ajouter dans le fichier `.service`
+```bash
+User=efrei-user
+Group=efrei-user
+```
 
 🌞 **Vérifier que le programme s'exécute bien sous l'identité de ce nouvel utilisateur**
 
-- avec une commande `ps`
-- encore là, filtrez la sortie avec un `| grep`
-- n'oubliez pas de redémarrer le service pour que ça prenne effet hein !
-
-> *Déjà à ce stade, le programme a des droits vraiment limités sur le système.*
+```bash
+[toto@rocky sbin]$ ps -ef | grep efrei
+efrei-u+    1574       1  0 11:27 ?        00:00:00 /bin/python3 /usr/local/bin/efrei_server/main.py
+toto        1619    1373  0 11:35 pts/0    00:00:00 grep --color=auto efrei
+# le nom du user était trop grand :(
+```
 
 ## 3. Maîtrisez l'emplacement des fichiers
 
-Pour fonctionner, l'application a besoin de deux choses :
-
-- des **variables d'environnement définies**, ou des valeurs par défaut nulles seront utilisées
-- un **fichier de log** où elle peut écrire
-  - par défaut elle écrit dans `/tmp` comme l'indique le warning au lancement de l'application
-  - vous pouvez définir la variable `LOG_DIR` pour choisir l'emplacement du fichier de logs
-
 🌞 **Choisir l'emplacement du fichier de logs**
 
-- créez un dossier dédié dans `/var/log/` (le dossier standard pour stocker les logs)
-- indiquez votre nouveau dossier de log à l'application avec la variable `LOG_DIR`
-- l'application créera un fichier `server.log` à l'intérieur
+```bash
+[toto@rocky tmp]$ mkdir /var/log/efrei_server
+```
+
+```bash
+[toto@rocky tmp]$ cat /usr/local/bin/efrei_server/env 
+LISTEN_ADDRESS=172.16.74.175
+LOG_DIR=/var/log/efrei_server/
+```
+
+```bash
+rm /tmp/server.log 
+```
 
 🌞 **Maîtriser les permissions du fichier de logs**
 
-- avec les commandes `chown` et `chmod`
-- appliquez les permissions les plus restrictives possibles sur le dossier dans `var/log/`
+```bash
+sudo chmod 700 efrei_server/
+```
 
-![chown chmod](./img/chown-chmod-2.webp)
+```bash
+sudo chown efrei_user:efrei-user efrei_server/
+``` 
 
 ## 4. Security hardening
 
