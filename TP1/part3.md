@@ -90,18 +90,41 @@ sudo chown efrei_user:efrei-user efrei_server/
 
 ## 4. Security hardening
 
-Il existe beaucoup de clauses qu'on peut ajouter dans un fichier `.service` pour que *systemd* s'occupe de sécuriser le service, en l'isolant du reste du système par exemple.
-
-Ainsi, une commande est fournie `systemd-analyze security` qui permet de voir quelles mesures de sécurité on a activé. Un score (un peu arbitraire) est attribué au *service* ; cela représente son "niveau de sécurité".
-
-Cette commande est **très** pratique d'un point de vue pédagogique : elle va vous montrer toutes les clauses qu'on peut ajouter dans un `.service` pour renforcer sa sécurité.
-
 🌞 **Modifier le `.service` pour augmenter son niveau de sécurité**
 
-- ajoutez au moins 5 clauses dans le fichier pour augmenter le niveau de sécurité de l'application
-- n'utilisez que des clauses que vous comprenez, useless sinon
+```bash
+PrivateTmp=True
+PrivateUsers=True
+CapabilityBoundingSet=~CAP_SYS_TIME
+NoNewPrivileges=True
+PrivateDevices=True
+ProtectClock=True
+ProtectKernelModules=True
+RestrictNamespaces=~user
+RestrictNamespaces=~pid
+RestrictNamespaces=~net
+RestrictNamespaces=~uts
+RestrictNamespaces=~mnt
+UMask=077
+SystemCallFilter=~@clock
+SystemCallFilter=~@cpu-emulation
+SystemCallFilter=~@debug
+SystemCallFilter=~@module
+SystemCallFilter=~@mount
+SystemCallFilter=~@obsolete
+SystemCallFilter=~@privileged
+SystemCallFilter=~@raw-jo
+SystemCallFilter=~@reboot
+SystemCallFilter=~@resources
+SystemCallFilter=~@swap
+ProtectHome=True
+CapabilityBoundingSet=~CAP_SYSLOG
+CapabilityBoundingSet=~CAP_SYS_ADMIN
+```
 
 🌟 **BONUS : Essayez d'avoir le score le plus haut avec `systemd-analyze security`**
+
+> Je n'arrive pas à descendre en dessous de 4.6.
 
 ➜ 💡💡💡 **A ce stade, vous pouvez ré-essayez l'injection que vous avez trouvé dans la partie 1. Normalement, on peut faire déjà moins de trucs avec.**
 
