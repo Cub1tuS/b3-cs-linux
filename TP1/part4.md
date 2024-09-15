@@ -51,35 +51,53 @@ Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src      Dst
 
 ## 2. Protéger l'app contre le flood
 
-Fail2ban notre vieil ami ! Fail2ban est un outil classique sur les OS GNU/Linux.
-
-**Le fonctionnement de fail2ban est simpliste :**
-
-- on lui demande de surveiller un fichier donné
-- on définit un pattern à repérer dans ce fichier
-- si plusieurs lignes correspondant au pattern se répètent, il effectue une action
-- par exemple, on ajoute une règle firewall
-
-> Quand on configure fail2ban pour surveiller un certain fichier, on dit qu'on crée une *jail* fail2ban.
-
-**Cas concret ici :**
-
 - dès qu'un client se connecte à notre service, une ligne de log est ajouté au fichier de log
 - cette ligne de log contient l'IP du client qui s'est connecté
-- si un client se connecte + de 5 fois en moins de 10 secondes (par exemple) on peut estimer que c'est du flood (tentative de DOS ?)
+- si un client se connecte + de 5 fois en moins de 10 secondes par exemple) on peut estimer que c'est du flood (tentative de DOS ?)
 - il faudrait blacklister automatiquement l'IP de ce client dans le firewall
 - fail2ban fait exactement ça
 
 🌞 **Installer fail2ban sur la machine**
 
+```bash
+sudo dnf install epel-release -y
+```
+
+```bash
+sudo dnf install -y fail2ban-server fail2ban-firewalld
+```
+
 🌞 **Ajouter une *jail* fail2ban**
+
+> Création du filtre
+
+```bash
+[toto@rocky filter.d]$ cat efrei_server.conf
+[Definition]
+failregex = \[\d+\.\d+\] Received '.*' from \('<HOST>', \d+\)
+ignoreregex =
+```
+
+> Création d'une jail
+
+```bash
+[toto@rocky jail.d]$ cat efrei_server.conf 
+[efrei_server]
+enabled  = true
+port     = 8888
+filter   = /etc/fail2ban/filter.d/efrei_server
+logpath  = /var/log/efrei_server/server.log
+maxretry = 6
+bantime  = 600
+findtime = 10
+```
 
 - elle doit lire le fichier de log du service, que vous avez normalement placé dans `/var/log/`
 - repérer la ligne de connexion d'un client
 - blacklist à l'aide du firewall l'IP de ce client
 
 🌞 **Vérifier que ça fonctionne !**
- 
+
 - faites-vous ban ! En faisant plein de connexions rapprochées avec le client
 - constatez que le ban est effectif
 - levez le ban (il y a une commande pour lever un ban qu'a réalisé fail2ban)
