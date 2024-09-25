@@ -51,12 +51,6 @@ Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src      Dst
 
 ## 2. Protéger l'app contre le flood
 
-- dès qu'un client se connecte à notre service, une ligne de log est ajouté au fichier de log
-- cette ligne de log contient l'IP du client qui s'est connecté
-- si un client se connecte + de 5 fois en moins de 10 secondes par exemple) on peut estimer que c'est du flood (tentative de DOS ?)
-- il faudrait blacklister automatiquement l'IP de ce client dans le firewall
-- fail2ban fait exactement ça
-
 🌞 **Installer fail2ban sur la machine**
 
 ```bash
@@ -69,6 +63,8 @@ sudo dnf install -y fail2ban-server fail2ban-firewalld
 
 🌞 **Ajouter une *jail* fail2ban**
 
+🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧
+
 > Création du filtre
 
 ```bash
@@ -78,7 +74,7 @@ failregex = \[\d+\.\d+\] Received '.*' from \('<HOST>', \d+\)
 ignoreregex =
 ```
 
-> Création d'une jail
+> Création d'une jailf
 
 ```bash
 [toto@rocky jail.d]$ cat efrei_server.conf 
@@ -143,4 +139,4 @@ Dans notre cas, avec notre ptit *service*, c'est un des problèmes :
 - la politique doit être la plus restrictive possible
 - c'est à dire que juste le strict minimum des *syscalls* nécessaires doit être autorisé
 
-![seccomp](./img/exploit_seccomp.png)
+🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧
